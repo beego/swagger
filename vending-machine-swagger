@@ -1,0 +1,361 @@
+openapi: 3.0.0
+info:
+  title: Vending Machine API
+  version: 1.0.0
+  description: |
+    Vending Machine APIs
+    
+    API Key [test]: HJF7R4S9T3YD2A8NB6C5X1ZL0MKJ3H5F8U9I0O2P1Q7W6E4
+
+servers:
+  - url: https://api.example.com/v1
+
+paths:
+  /products:
+    get:
+      summary: "獲取產品列表"
+      description: "Get all of product informations"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "成功獲取產品列表"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+
+  /aisles:
+    get:
+      summary: "獲取貨道列表"
+      description: "Get the list of aisles"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "成功獲取貨道列表"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Aisle"
+
+  /orders:
+    post:
+      summary: "提交訂單"
+      description: "Submit an order"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: orderID
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: productID
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: invoiceType
+          in: query
+          required: true
+          description: |
+                   1: invoice carrier
+                
+                   2: invoice lovecode
+
+                   3: ?store in the cloud
+          schema:
+            type: integer
+            enum:
+              - 1
+              - 2
+              - 3
+        - name: invoiceInfo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: discountCoupon
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: hasHeating
+          in: query
+          required: true
+          schema:
+            type: boolean
+        - name: hasCutlery
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: "成功提交訂單"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+
+  /payment:
+    post:
+      summary: "訂單付款"
+      description: "Make a payment for an order"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: orderID
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: paymentMethod
+          in: query
+          required: true
+          description: |
+                   1: cash
+
+                   2: credit-card
+                   
+                   3: electronic-card
+                   
+                   4: third-party
+          schema:
+            type: integer
+            enum: 
+              - 1
+              - 2
+              - 3
+              - 4
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: productID
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "成功支付訂單"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+
+  /payment/method:
+    get:
+      summary: "獲取支付方式列表"
+      description: "Get the list of payment methods"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "成功獲取支付方式列表"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: string
+
+  /invoice/carrier:
+    get:
+      summary: "獲取發票載具"
+      description: "Get the invoice carrier"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "成功獲取發票載具"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: string
+                    example: "/abc1234"
+
+  /invoice/invoice_donations:
+    get:
+      summary: "獲取發票捐贈單位"
+      description: "Get the list of invoice donation units"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "成功獲取發票捐贈單位"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Donation"
+
+  /pruduct_tags:
+    get:
+      summary: "獲取商品標籤列表"
+      description: "Get the list of product tags(use on side bar page)"
+      tags:
+        - Customer APIs
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "成功獲取標籤列表"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  data:
+                    type: array
+                    items:
+                      type: string
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        canSelect:
+          type: boolean
+        discount:
+          type: number
+        price:
+          type: number
+        hasHeating:
+          type: boolean
+        hasCutlery:
+          type: boolean
+        tags:
+          type: string
+        cookingTime:
+          type: integer
+        cutleryPrice:
+          type: number
+        image:
+          type: string
+    Aisle:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        productID:
+          type: string
+        fullCount:
+          type: integer
+        stockCount:
+          type: integer
+        restockCount:
+          type: integer
+        shelfLifeDate:
+          type: string
+          format: date
+        state:
+          type: string
+    Order:
+      type: object
+      properties:
+        orderID:
+          type: string
+        productID:
+          type: string
+        invoiceType:
+          type: string
+        invoiceInfo:
+          type: string
+        amount:
+          type: integer
+        discountCoupon:
+          type: string
+        hasHeating:
+          type: boolean
+        hasCutlery:
+          type: boolean
+    Donation:
+      type: object
+      properties:
+        donationName:
+          type: string
+        donationCode:
+          type: string
